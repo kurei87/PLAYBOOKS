@@ -31,7 +31,7 @@
       
     - name: Reboot the machine
       ansible.builtin.reboot:
-        reboot_timeout: 600    # wait up to 10 minutes
+        reboot_timeout: "{{ reboot_timeout }}"    # wait up to 10 minutes
         msg: "Reboot initiated by Ansible"
         pre_reboot_delay: 0
         post_reboot_delay: 10
