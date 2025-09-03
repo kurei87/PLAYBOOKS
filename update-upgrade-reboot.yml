@@ -1,0 +1,30 @@
+---
+- name: Update, upgrade and reboot if needed (Ubuntu/Debian)
+  hosts: all
+  become: yes
+  vars:
+    reboot_timeout: 600    # seconds to wait for host to come back after reboot
+
+  tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Upgrade all packages (dist upgrade) and autoremove
+      ansible.builtin.apt:
+        upgrade: dist
+        autoremove: yes
+
+    - name: Check if reboot is required
+      ansible.builtin.stat:
+        path: /var/run/reboot-required
+      register: reboot_req
+
+    - name: Reboot if required
+      ansible.builtin.reboot:
+        reboot_timeout: "{{ reboot_timeout }}"
+        pre_reboot_delay: 0
+        post_reboot_delay: 10
+        test_command: whoami
+      when: reboot_req.stat.exists
